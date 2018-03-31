@@ -11,6 +11,8 @@ Produce beautiful fraktals with Python using `matplotlib`.
 
 ## Examples
 
+[Progression of exponent](https://www.youtube.com/watch?v=0Www-qkAeb0)
+
 ### 4k Background
 
 ```bash
