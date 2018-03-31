@@ -1,12 +1,20 @@
 #!/usr/bin/python3
 
+# Changelog
+#
+# 1.00: Init
+# 1.01: Parallel support, --version option
+#
+
+VERSION=1.01
+
 import numpy as np
 import argparse
 import sys
-from numba import jit
+from numba import jit, njit, prange
 import matplotlib.pyplot as plt
 
-@jit(nogil=True,nopython=True,cache=True)
+@jit(nogil=True,nopython=True,cache=False,parallel=True)
 def mandelcalc(z,maxiter,exp):
     '''
     Iterate the mandelbrot calculation until maxiter for given z.
@@ -15,14 +23,14 @@ def mandelcalc(z,maxiter,exp):
     c = z
     z = 0
 
-    for i in range(maxiter):
+    for i in prange(maxiter):
         z = z**exp + c
         if z.real**2 + z.imag**2 > 4:
             return i
 
     return 0
 
-@jit(nogil=True,nopython=True,cache=True)
+@jit(nogil=True,nopython=True,cache=False,parallel=True)
 def mandelbrot(x,y,maxiter,exp,skiptest):
     '''
     Generate the mandelbrot figure of resolution y,x
@@ -32,8 +40,8 @@ def mandelbrot(x,y,maxiter,exp,skiptest):
     skiptest:   Boolean for skipping cardiodi checking
     '''
     array = np.zeros( (len(y), len(x)) )
-    for X in range(len(x)):
-        for Y in range(len(y)):
+    for X in prange(len(x)):
+        for Y in prange(len(y)):
 
             # Iterate over all points
             if skiptest:
@@ -59,6 +67,7 @@ def test_inner(x,y):
     if x < p - 2*p**2 + .25 or q < 1/16:return 1
     else:return 0
 
+@jit(nogil=True,nopython=False,cache=True)
 def saturate(array, saturation=None, offset=0):
     '''
     Nonlinearly push high values by
@@ -91,6 +100,7 @@ def saturate(array, saturation=None, offset=0):
     else:
         return normalize(array)
 
+@jit(nogil=True,nopython=True,cache=True)
 def normalize(array):
     '''
     Normalize numpy array to unit interval [0,1]
@@ -99,6 +109,10 @@ def normalize(array):
     array = array / ( np.max(array)-np.min(array) )
 
     return array
+
+if any([1 if arg in sys.argv else 0 for arg in ['--version']]):
+    print("Version: %.2f" % VERSION)
+    sys.exit(0)
 
 parser = argparse.ArgumentParser(description='Generate Mandelbrot Fraktal', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('-v', '--verbose', action = 'store_const', const = 1,
@@ -113,7 +127,7 @@ parser.add_argument('--histogram', action = 'store_const', const = 1,
                     default = 0, help = 'Save histogram of colordistribution to histogram.pdf')
 parser.add_argument('-s', '--skiptest', action = 'store_const', const = 1,
                     default = 0, help = 'Turn off pretest for inner of appleman (cardioid)')
-parser.add_argument('--saturation', help='Increase colorfulness. Typical: 1, 2, 3,...', default=None, type=int)
+parser.add_argument('--saturation', help='Increase colorfulness. Typical: 1, 2, 3,...', default=None, type=float)
 parser.add_argument('--exponent', help='Alter exponent for mandelbrot recursion', default=2, type=float)
 
 subparsers = parser.add_subparsers(title='Functions',
@@ -137,7 +151,7 @@ cmaps = ['viridis', 'plasma', 'inferno', 'magma', 'Greys', 'Purples', 'Blues', '
 args = parser.parse_args()
 
 if not args.colormap in cmaps and not args.colormap.replace('_r','') in cmaps:
-    raise ValueError("Not a matplotlib colormap! Choose one of\n{}\n{}".format(",".join(cmaps),'See https://matplotlib.org/examples/color/colormaps_reference.html'))
+    raise ValueError("{} not a matplotlib colormap! Choose one of the following (and _r for reverse):\n{}\n{}".format(args.colormap, ",".join(cmaps),'See https://matplotlib.org/examples/color/colormaps_reference.html'))
 
 #################### RANGE ####################
 
