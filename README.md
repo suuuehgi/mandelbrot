@@ -1,5 +1,6 @@
-# Mandelbrot calculator
-Produce beautiful fraktals with Python -- Fast with little dependencies
+# Mandelbrot Calculator
+
+Produce beautiful fraktals with Python using `matplotlib`.
 
 ## Dependencies
 
