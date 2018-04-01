@@ -135,7 +135,7 @@ subparsers = parser.add_subparsers(title='Functions',
                     help='help',
                     dest='operation')
 
-parser_range = subparsers.add_parser('range', help='Range in xy plane squeezed into square', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser_range = subparsers.add_parser('range', help='Range in xy plane with small length == --pixel', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser_range.add_argument('--xyrange', help='Choose exact sector: xmin:xmax,ymin:ymax', default='-1.5:.5,-1:1', type=str)
 parser_range.add_argument('-P', '--pixel', help='Resolution/Length of square image', default=1000, type=int)
 
@@ -159,13 +159,24 @@ if args.operation == "range":
 
     xmin = float(args.xyrange.split(',')[0].split(':')[0])
     xmax = float(args.xyrange.split(',')[0].split(':')[1])
+    temp = [xmin, xmax]
+    xmax = np.max(temp)
+    xmin = np.min(temp)
+    if xmin == xmax:
+        raise ValueError('Empty range: xmin=xmax')
+
     ymin = float(args.xyrange.split(',')[1].split(':')[0])
     ymax = float(args.xyrange.split(',')[1].split(':')[1])
+    temp = [ymin, ymax]
+    ymax = np.max(temp)
+    ymin = np.min(temp)
+    if ymin == ymax:
+        raise ValueError('Empty range: ymin=ymax')
 
     Dx = xmax - xmin
     Dy = ymax - ymin
 
-    # Detect orientation
+    # Detect orientation and set size
     if Dy >= Dx:
         height = int(np.round(args.pixel * (Dy / Dx)))
         width = args.pixel
@@ -236,6 +247,7 @@ x = np.linspace(xmin, xmax, width)
 y = np.linspace(ymin, ymax, height)
 
 array = mandelbrot(x,y,maxiter=args.maxiter,exp=args.exponent,skiptest=args.skiptest)
+print(array)
 
 # Flip image
 if args.flip: array = array.T
