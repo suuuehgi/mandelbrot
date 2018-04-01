@@ -1,6 +1,6 @@
 # Mandelbrot Calculator
 
-Produce beautiful fraktals with Python using `matplotlib`.
+Produce beautiful fraktals with Python using `numba` parallel optimization.
 
 ## Dependencies
 
@@ -28,3 +28,13 @@ $ time python3 mandelbrot.py -o example_star.png --colormap=BuPu --maxiter 2000 
 python3 mandelbrot.py -o example_star.png --colormap=BuPu --maxiter 2000       35,12s user 0,83s system 243% cpu 14,777 total
 ```
 [<img src="examples/example_star_small.png">](examples/example_star.png)
+
+### Phone
+
+Need a new background image (Samsung Galaxy S2, 480x800)?
+
+```bash
+$ time ./mandelbrot.py -o example_cellphone.png --maxiter 1500 --colormap=PiYG --saturation=8 point --point=-.51:-.61 -R 480x800 -F 5 --power 6
+./mandelbrot.py -o example_cellphone.png --maxiter 1500 --colormap=PiYG  poin  1,90s user 0,09s system 104% cpu 1,906 total
+```
+[<img src="examples/example_cellphone.png">](examples/example_cellphone.png)
