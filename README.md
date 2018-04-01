@@ -34,7 +34,8 @@ python3 mandelbrot.py -o example_star.png --colormap=BuPu --maxiter 2000       3
 Need a new background image (Samsung Galaxy S2, 480x800)?
 
 ```bash
-$ time ./mandelbrot.py -o example_cellphone.png --maxiter 1500 --colormap=PiYG --saturation=8 point --point=-.51:-.61 -R 480x800 -F 5 --power 6
-./mandelbrot.py -o example_cellphone.png --maxiter 1500 --colormap=PiYG  poin  1,90s user 0,09s system 104% cpu 1,906 total
+$ time ./mandelbrot.py -o example_cellphone_big.png --maxiter 1500 --colormap=PiYG --saturation=8 point --point=-.51:-.61 -R 960x1600 -F 5 --power 6
+./mandelbrot.py -o example_cellphone_big.png --maxiter 1500 --colormap=PiYG    2,61s user 0,12s system 116% cpu 2,338 total
+$ convert example_cellphone_big.png -resize 480 example_cellphone.png
 ```
 [<img src="examples/example_cellphone.png">](examples/example_cellphone.png)
