@@ -247,7 +247,6 @@ x = np.linspace(xmin, xmax, width)
 y = np.linspace(ymin, ymax, height)
 
 array = mandelbrot(x,y,maxiter=args.maxiter,exp=args.exponent,skiptest=args.skiptest)
-print(array)
 
 # Flip image
 if args.flip: array = array.T
